@@ -1,0 +1,31 @@
+function mutInfo = getMutualInfo( X, Y )
+
+% Get P( X )
+[ n, x ] = hist( X, [ 0 1 ] );
+pX = n ./ length( X );
+
+% Get P( Y )
+[ n, x ] = hist( Y, [ 0 1 ] );
+pY = n ./ length( Y );
+
+XY = [ X ; Y ];
+pXY = hist3( transpose( XY ), 'NBins', [ 2, 2 ] ) ./ length( X );
+
+pXgY = [ ( pXY( 1, 1 ) / pY( 1 ) ) ( pXY( 1, 2 ) / pY( 2 ) ) ;
+         ( pXY( 2, 1 ) / pY( 1 ) ) ( pXY( 2, 2 ) / pY( 2 ) ) 
+       ];
+
+mutInfo = 0;
+
+for j = 1 : 2
+   for k = 1 : 2
+       symbInfo = ( pXY( j, k ) * log2( pX( j ) * pXgY( j, k ) ) );
+       if( isnan( symbInfo ) & pXY( j, k ) == 0 )
+           symbInfo = 0;
+       end
+       mutInfo = mutInfo + symbInfo;
+   end
+end
+mutInfo = -mutInfo;
+end
+
